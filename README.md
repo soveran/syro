@@ -1,0 +1,211 @@
+Syro
+====
+
+Simple router for web applications.
+
+Description
+-----------
+
+Syro is a very simple router for web applications. It was created
+in the tradition of libraries like [Rum][rum] and [Cuba][cuba], but
+it promotes a less flexible usage pattern. The design is inspired
+by the way some Cuba applications are architected: modularity is
+encouraged and sub-applications can be dispatched without any
+significant performance overhead.
+
+[rum]: http://github.com/chneukirchen/rum
+[cuba]: http://cuba.is
+
+Usage
+-----
+
+An example of a modular application would look like this:
+
+```ruby
+admin = Syro.new {
+  get {
+    res.write "Hello from admin!"
+  }
+}
+
+app = Syro.new {
+  on("admin") {
+    run(admin)
+  }
+}
+```
+
+The block is evaluated in a sandbox where the following methods are
+available: `env`, `req`, `res`, `inbox`, `call`, `run`, `halt`,
+`match`, `on`, `root?`, `root`, `get?`, `post?`, `patch?`, `delete?`,
+`get`, `post`, `patch` and `delete`.
+
+As a recommendation, user created variables should be instance
+variables. That way they won't mix with the API methods defined in
+the sandbox. All the internal instance variables defined by Syro
+are prefixed by `syro_`, like in `@syro_inbox`.
+
+API
+---
+
+`env`: Environment variables for the request.
+
+`req`: Helper object for accessing the request variables. It's an
+instance of `Rack::Request`.
+
+`res`: Helper object for creating the response. It's an instance
+of `Syro::Response`.
+
+`inbox`: Hash with captures and potentially other variables local
+to the request.
+
+`call`: Entry point for the application. It receives the environment
+and optionally an inbox.
+
+`run`: Runs a sub app, and accepts an inbox as an optional second
+argument.
+
+`halt`: Terminates the request. It receives an array with the
+response as per Rack's specification.
+
+`match`: Receives a String, a Symbol or a boolean, and returns true
+if it matches the request.
+
+`on`: Receives a value to be matched, and a block that will be
+executed only if the request is matched.
+
+`root?`: Returns true if the path yet to be consumed is empty.
+
+`root`: Receives a block and calls it only if `root?` is true.
+
+`get?`: Returns true if the `REQUEST_METHOD` is `GET`.
+
+`get`: Receives a block and calls it only if `root?` and `get?` are
+true.
+
+`post?`: Returns true if the `REQUEST_METHOD` is `POST`.
+
+`post`: Receives a block and calls it only if `root?` and `post?`
+are true.
+
+`patch?`: Returns true if the `REQUEST_METHOD` is `PATCH`.
+
+`patch`: Receives a block and calls it only if `root?` and `patch?`
+are true.
+
+`delete?`: Returns true if the `REQUEST_METHOD` is `DELETE`.
+
+`delete`: Receives a block and calls it only if `root?` and `delete?`
+are true.
+
+Examples
+--------
+
+In the following examples, the response string represents
+the request path that was sent.
+
+```ruby
+app = Syro.new {
+  get {
+    res.write "GET /"
+  }
+
+  post {
+    res.write "POST /"
+  }
+
+  on("users") {
+    on(:id) {
+
+      # Captured values go to the inbox
+      @user = User[inbox[:id]]
+
+      get {
+        res.write "GET /users/42"
+      }
+
+      patch {
+        res.write "PATCH /users/42"
+      }
+
+      delete {
+        res.write "DELETE /users/42"
+      }
+    }
+
+    get {
+      res.write "GET /users"
+    }
+
+    post {
+      res.write "POST /users"
+    }
+  }
+}
+```
+
+Matches
+-------
+
+The `on` method can receive a `String` to perform path matches; a
+`Symbol` to perform path captures; and a boolean to match any true
+values.
+
+Each time `on` matches or captures a segment of the PATH, that part
+of the path is consumed. The current and previous paths can be
+queried by calling `prev` and `curr` on the `path` object: `path.prev`
+returns the part of the path already consumed, and `path.curr`
+provides the current version of the path.
+
+Any expression that evaluates to a boolean can also be used as a
+matcher.  For example, a common pattern is to follow some route
+only if a user is authenticated. That can be accomplished with
+`on(authenticated(User))`. That example assumes there's a method
+called `authenticated` that returns true or false depending on
+whether or not an instance of `User` is authenticated. As a side
+note, [Shield][shield] is a library that provides just that.
+
+[shield]: https://github.com/cyx/shield
+
+Captures
+--------
+
+When a symbol is provided, `on` will try to consume a segment of
+the path. A segment is defined as any sequence of characters after
+a slash and until either another slash or the end of the string.
+The captured value is stored in the `inbox` hash under the key that
+was provided as the argument to `on`. For example, after a call to
+`on(:user_id)`, the value for the segment will be stored at
+`inbox[:user_id]`. When mounting an application called `users` with
+the command `run(users)`, an inbox can be provided as the second
+argument: `run(users, inbox)`. That allows apps to share previous
+captures.
+
+Security
+--------
+
+There are no security features built into this routing library. A
+framework using this library should implement the security layer.
+
+Rendering
+---------
+
+There are no rendering features built into this routing library. A
+framework that uses this routing library can easily implement helpers
+for rendering.
+
+Trivia
+------
+
+The name comes from SImple ROuter, so it more or less rhymes with
+"zero". An initial idea was to release a new version of Cuba that
+broke backward compatibility, but in the end my friends suggested
+to release this as a separate library. In the future, some ideas
+of this library could be included in Cuba as well.
+
+Installation
+------------
+
+```
+$ gem install syro
+```
