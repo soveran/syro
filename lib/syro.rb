@@ -123,7 +123,7 @@ class Syro
     def call(env, inbox)
       @syro_env = env
       @syro_req = Rack::Request.new(env)
-      @syro_res = Syro::Response.new({})
+      @syro_res = Syro::Response.new
       @syro_path = Seg.new(env.fetch(Syro::PATH_INFO))
       @syro_inbox = inbox
 
@@ -248,10 +248,10 @@ class Syro
   end
 
   def initialize(&block)
-    @sandbox = Sandbox.new(block)
+    @code = block
   end
 
   def call(env, inbox = {})
-    @sandbox.call(env, inbox)
+    Sandbox.new(@code).call(env, inbox)
   end
 end

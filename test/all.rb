@@ -88,6 +88,20 @@ app = Syro.new {
       }
     }
   }
+
+  on("one") {
+    @one = "1"
+
+    get {
+      res.write(@one)
+    }
+  }
+
+  on("two") {
+    get {
+      res.write(@one)
+    }
+  }
 }
 
 setup do
@@ -155,5 +169,15 @@ end
 test "inherited inbox" do |f|
   f.get("/posts/42/comments")
   assert_equal "GET /posts/42/comments", f.last_response.body
+  assert_equal 200, f.last_response.status
+end
+
+test "leaks" do |f|
+  f.get("/one")
+  assert_equal "1", f.last_response.body
+  assert_equal 200, f.last_response.status
+
+  f.get("/two")
+  assert_equal "", f.last_response.body
   assert_equal 200, f.last_response.status
 end
