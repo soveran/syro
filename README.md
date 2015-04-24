@@ -37,8 +37,7 @@ app = Syro.new {
 
 The block is evaluated in a sandbox where the following methods are
 available: `env`, `req`, `res`, `inbox`, `call`, `run`, `halt`,
-`match`, `on`, `root?`, `root`, `get?`, `post?`, `patch?`, `delete?`,
-`get`, `post`, `patch` and `delete`.
+`match`, `on`, `root?`, `root`,`get`, `post`, `patch` and `delete`.
 
 As a recommendation, user created variables should be instance
 variables. That way they won't mix with the API methods defined in
@@ -78,24 +77,16 @@ executed only if the request is matched.
 
 `root`: Receives a block and calls it only if `root?` is true.
 
-`get?`: Returns true if the `REQUEST_METHOD` is `GET`.
-
-`get`: Receives a block and calls it only if `root?` and `get?` are
+`get`: Receives a block and calls it only if `root?` and `req.get?` are
 true.
 
-`post?`: Returns true if the `REQUEST_METHOD` is `POST`.
-
-`post`: Receives a block and calls it only if `root?` and `post?`
+`post`: Receives a block and calls it only if `root?` and `req.post?`
 are true.
 
-`patch?`: Returns true if the `REQUEST_METHOD` is `PATCH`.
-
-`patch`: Receives a block and calls it only if `root?` and `patch?`
+`patch`: Receives a block and calls it only if `root?` and `req.patch?`
 are true.
 
-`delete?`: Returns true if the `REQUEST_METHOD` is `DELETE`.
-
-`delete`: Receives a block and calls it only if `root?` and `delete?`
+`delete`: Receives a block and calls it only if `root?` and `req.delete?`
 are true.
 
 Examples
