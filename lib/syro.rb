@@ -33,20 +33,15 @@ class Syro
   SCRIPT_NAME = "SCRIPT_NAME".freeze
   REQUEST_METHOD = "REQUEST_METHOD".freeze
 
+  # Content-override comparison string, preemptively
+  # frozen for performance
+  POST = "POST".freeze
+
   # Response headers
   LOCATION = "Location".freeze
   CONTENT_TYPE = "Content-Type".freeze
   CONTENT_LENGTH = "Content-Length".freeze
   CONTENT_TYPE_DEFAULT = "text/html".freeze
-
-  # Request methods
-  GET = 'GET'.freeze
-  POST = 'POST'.freeze
-  PATCH = 'PATCH'.freeze
-  DELETE = 'DELETE'.freeze
-
-  # Available methods
-  METHODS = [GET, POST, PATCH, DELETE].freeze
 
   class Response
     attr_accessor :status
@@ -136,8 +131,6 @@ class Syro
         end
       end
 
-      @syro_method = Syro::METHODS.index(env[Syro::REQUEST_METHOD])
-
       result = catch(:halt) do
         instance_eval(&@syro_code)
 
@@ -198,24 +191,8 @@ class Syro
       end
     end
 
-    def get?
-      @syro_method == 0
-    end
-
-    def post?
-      @syro_method == 1
-    end
-
-    def patch?
-      @syro_method == 2
-    end
-
-    def delete?
-      @syro_method == 3
-    end
-
     def get
-      if root? && get?
+      if root? && req.get?
         yield
 
         halt(res.finish)
@@ -223,7 +200,7 @@ class Syro
     end
 
     def post
-      if root? && post?
+      if root? && req.post?
         yield
 
         halt(res.finish)
@@ -231,7 +208,7 @@ class Syro
     end
 
     def patch
-      if root? && patch?
+      if root? && req.patch?
         yield
 
         halt(res.finish)
@@ -239,7 +216,7 @@ class Syro
     end
 
     def delete
-      if root? && delete?
+      if root? && req.delete?
         yield
 
         halt(res.finish)
