@@ -1,17 +1,17 @@
 # encoding: UTF-8
 #
 # Copyright (c) 2015 Michel Martens
-# 
+#
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in
 # all copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -24,9 +24,6 @@ require "rack"
 require "seg"
 
 class Syro
-
-  # Method override parameter
-  OVERRIDE = "_method".freeze
 
   # HTTP environment variables
   PATH_INFO = "PATH_INFO".freeze
@@ -121,15 +118,6 @@ class Syro
       @syro_res = Syro::Response.new
       @syro_path = Seg.new(env.fetch(Syro::PATH_INFO))
       @syro_inbox = inbox
-
-
-      if env[Syro::REQUEST_METHOD] == Syro::POST
-        value = @syro_req.POST[Syro::OVERRIDE]
-
-        if value != nil
-          env[Syro::REQUEST_METHOD] = value.upcase
-        end
-      end
 
       result = catch(:halt) do
         instance_eval(&@syro_code)
