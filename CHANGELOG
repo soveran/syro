@@ -1,2 +1,7 @@
-* Remove codes for request mothod overrding.
-  Larry Lv
+0.0.3 (unreleased)
+
+* Remove request method overriding (@larrylv)
+
+0.0.2
+
+* Defer method comparisons to Rack::Request (@pote)
