@@ -24,23 +24,10 @@ require "rack"
 require "seg"
 
 class Syro
-
-  # HTTP environment variables
-  PATH_INFO = "PATH_INFO".freeze
-  SCRIPT_NAME = "SCRIPT_NAME".freeze
-  REQUEST_METHOD = "REQUEST_METHOD".freeze
-
-  # Content-override comparison string, preemptively
-  # frozen for performance
-  POST = "POST".freeze
-
-  # Response headers
-  LOCATION = "Location".freeze
-  CONTENT_TYPE = "Content-Type".freeze
-  CONTENT_LENGTH = "Content-Length".freeze
-  CONTENT_TYPE_DEFAULT = "text/html".freeze
-
   class Response
+    LOCATION = "Location".freeze
+    DEFAULT = "text/html".freeze
+
     attr_accessor :status
 
     attr :body
@@ -65,16 +52,25 @@ class Syro
       s = str.to_s
 
       @length += s.bytesize
-      @headers[Syro::CONTENT_LENGTH] = @length.to_s
+      @headers[Rack::CONTENT_LENGTH] = @length.to_s
       @body << s
     end
 
     def redirect(path, status = 302)
-      @headers[Syro::LOCATION] = path
-      @status  = status
+      @headers[LOCATION] = path
+      @status = status
     end
 
     def finish
+      if @status.nil?
+        if @body.empty?
+          @status = 404
+        else
+          @headers[Rack::CONTENT_TYPE] ||= DEFAULT
+          @status = 200
+        end
+      end
+
       [@status, @headers, @body]
     end
 
@@ -116,32 +112,19 @@ class Syro
       @syro_env = env
       @syro_req = Rack::Request.new(env)
       @syro_res = Syro::Response.new
-      @syro_path = Seg.new(env.fetch(Syro::PATH_INFO))
+      @syro_path = Seg.new(env.fetch(Rack::PATH_INFO))
       @syro_inbox = inbox
 
-      result = catch(:halt) do
+      catch(:halt) do
         instance_eval(&@syro_code)
 
-        @syro_res.status = 404
         @syro_res.finish
       end
-
-      if result[0].nil?
-        if result[2].empty?
-          result[0] = 404
-        else
-          result[1][Syro::CONTENT_TYPE] ||=
-                    Syro::CONTENT_TYPE_DEFAULT
-          result[0] = 200
-        end
-      end
-
-      result
     end
 
     def run(app, inbox = {})
-      env[Syro::PATH_INFO] = @syro_path.curr
-      env[Syro::SCRIPT_NAME] = @syro_path.prev
+      env[Rack::PATH_INFO] = @syro_path.curr
+      env[Rack::SCRIPT_NAME] = @syro_path.prev
 
       halt(app.call(env, inbox))
     end
