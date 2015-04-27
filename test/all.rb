@@ -101,6 +101,10 @@ app = Syro.new {
     get {
       res.write(@one)
     }
+
+    post {
+      res.redirect("/one")
+    }
   }
 }
 
@@ -179,5 +183,14 @@ test "leaks" do |f|
 
   f.get("/two")
   assert_equal "", f.last_response.body
+  assert_equal 200, f.last_response.status
+end
+
+test "redirect" do |f|
+  f.post("/two")
+  assert_equal 302, f.last_response.status
+
+  f.follow_redirect!
+  assert_equal "1", f.last_response.body
   assert_equal 200, f.last_response.status
 end
