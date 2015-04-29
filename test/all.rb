@@ -1,6 +1,19 @@
+class TextualDeck < Syro::Deck
+  def text(str)
+    res[Rack::CONTENT_TYPE] = "text/plain"
+    res.write(str)
+  end
+end
+
+textual = Syro.new(TextualDeck) {
+  get {
+    text("GET /textual")
+  }
+}
+
 admin = Syro.new {
   get {
-    res.write "GET /admin"
+    res.write("GET /admin")
   }
 }
 
@@ -106,6 +119,10 @@ app = Syro.new {
       res.redirect("/one")
     }
   }
+
+  on("textual") {
+    run(textual)
+  }
 }
 
 setup do
@@ -192,5 +209,12 @@ test "redirect" do |f|
 
   f.follow_redirect!
   assert_equal "1", f.last_response.body
+  assert_equal 200, f.last_response.status
+end
+
+test "custom deck" do |f|
+  f.get("/textual")
+  assert_equal "GET /textual", f.last_response.body
+  assert_equal "text/plain", f.last_response.headers["Content-Type"]
   assert_equal 200, f.last_response.status
 end

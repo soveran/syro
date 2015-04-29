@@ -83,7 +83,7 @@ class Syro
     end
   end
 
-  class Sandbox
+  class Deck
     def initialize(code)
       @syro_code = code
     end
@@ -195,11 +195,12 @@ class Syro
     end
   end
 
-  def initialize(&block)
-    @code = block
+  def initialize(deck = Deck, &code)
+    @deck = deck
+    @code = code
   end
 
   def call(env, inbox = {})
-    Sandbox.new(@code).call(env, inbox)
+    @deck.new(@code).call(env, inbox)
   end
 end

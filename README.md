@@ -89,6 +89,37 @@ are true.
 `delete`: Receives a block and calls it only if `root?` and `req.delete?`
 are true.
 
+Decks
+-----
+
+The sandbox where the application is evaluated is an instance of
+`Syro::Deck`, and it provides the API described earlier. You can
+define your own `Deck` and pass it to the `Syro` constructor. All
+the methods defined in there will be accessible from your routes.
+Here's an example:
+
+```ruby
+class TextualDeck < Syro::Deck
+  def text(str)
+    res[Rack::CONTENT_TYPE] = "text/plain"
+    res.write(str)
+  end
+end
+
+App = Syro.new(TextualDeck) {
+  get {
+    text("hello world")
+  }
+}
+```
+
+The example is simple enough to showcase the concept, but maybe too
+simple to be meaningful. The idea is that you can create your own
+specialized decks and reuse them in different applications. You can
+also define modules and later include them in your decks: for
+example, you can write modules for rendering or serializing data,
+and then you can combine those modules in your custom decks.
+
 Examples
 --------
 
