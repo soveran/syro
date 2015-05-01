@@ -1,3 +1,11 @@
+0.0.5
+
+* Add explicit Rack version dependency (@luislavena)
+
+0.0.4
+
+* Add concept of Decks
+
 0.0.3
 
 * Remove request method overriding (@larrylv)
