@@ -216,6 +216,26 @@ There are no rendering features built into this routing library. A
 framework that uses this routing library can easily implement helpers
 for rendering.
 
+Middleware
+----------
+
+Syro doesn't support Rack middleware out of the box. If you need them,
+just use `Rack::Builder`:
+
+```ruby
+app = Rack::Builder.new do
+
+  use Rack::Session::Cookie, secret: "..."
+
+  run Syro.new {
+    get {
+      res.write("Hello, world")
+    }
+  }
+
+end
+```
+
 Trivia
 ------
 
