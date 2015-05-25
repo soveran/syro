@@ -1,3 +1,7 @@
+0.0.6
+
+* Add put request method
+
 0.0.5
 
 * Add explicit Rack version dependency (@luislavena)
