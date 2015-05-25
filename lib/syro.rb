@@ -170,6 +170,14 @@ class Syro
       end
     end
 
+    def put
+      if root? && req.put?
+        yield
+
+        halt(res.finish)
+      end
+    end
+
     def post
       if root? && req.post?
         yield

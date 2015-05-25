@@ -58,6 +58,10 @@ app = Syro.new {
         res.write("GET /foo/bar")
       }
 
+      put {
+        res.write("PUT /foo/bar")
+      }
+
       post {
         res.write("POST /foo/bar")
       }
@@ -134,13 +138,17 @@ test "path + verb" do |f|
   assert_equal 200, f.last_response.status
   assert_equal "GET /foo/bar", f.last_response.body
 
-  f.patch("/foo/bar")
+  f.put("/foo/bar")
   assert_equal 200, f.last_response.status
-  assert_equal "PATCH /foo/bar", f.last_response.body
+  assert_equal "PUT /foo/bar", f.last_response.body
 
   f.post("/foo/bar")
   assert_equal 200, f.last_response.status
   assert_equal "POST /foo/bar", f.last_response.body
+
+  f.patch("/foo/bar")
+  assert_equal 200, f.last_response.status
+  assert_equal "PATCH /foo/bar", f.last_response.body
 
   f.delete("/foo/bar")
   assert_equal 200, f.last_response.status
