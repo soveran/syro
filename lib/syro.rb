@@ -211,7 +211,7 @@ class Syro
     @code = code
   end
 
-  def call(env)
-    @deck.new(@code).call(env, env.fetch(Syro::INBOX, {}))
+  def call(env, inbox = env.fetch(Syro::INBOX, {}))
+    @deck.new(@code).call(env, inbox)
   end
 end
