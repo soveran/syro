@@ -1,3 +1,9 @@
+class RackApp
+  def call(env)
+    [200, {"Content-Type" => "text/html"}, ["GET /rack"]]
+  end
+end
+
 class TextualDeck < Syro::Deck
   def text(str)
     res[Rack::CONTENT_TYPE] = "text/plain"
@@ -90,6 +96,10 @@ app = Syro.new {
     run(platforms, id: 42)
   }
 
+  on("rack") {
+    run(RackApp.new)
+  }
+
   on("users") {
     on(:id) {
       res.write(sprintf("GET /users/%s", inbox[:id]))
@@ -170,6 +180,12 @@ end
 test "mounted app + inbox" do |f|
   f.get("/platforms")
   assert_equal "GET /platforms/42", f.last_response.body
+  assert_equal 200, f.last_response.status
+end
+
+test "run rack app" do |f|
+  f.get("/rack")
+  assert_equal "GET /rack", f.last_response.body
   assert_equal 200, f.last_response.status
 end
 
