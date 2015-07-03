@@ -219,9 +219,8 @@ for rendering.
 Trivia
 ------
 
-The name comes from SImple ROuter, so it more or less rhymes with
-"zero". An initial idea was to release a new version of Cuba that
-broke backward compatibility, but in the end my friends suggested
+An initial idea was to release a new version of [Cuba](http://cuba.is)
+that broke backward compatibility, but in the end my friends suggested
 to release this as a separate library. In the future, some ideas
 of this library could be included in Cuba as well.
 
