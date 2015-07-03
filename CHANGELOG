@@ -1,3 +1,7 @@
+0.0.7
+
+* Change run so that it accepts Rack applications
+
 0.0.6
 
 * Add put request method
