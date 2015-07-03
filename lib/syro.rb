@@ -24,6 +24,8 @@ require "rack"
 require "seg"
 
 class Syro
+  INBOX = "syro.inbox".freeze
+
   class Response
     LOCATION = "Location".freeze
     DEFAULT = "text/html".freeze
@@ -125,8 +127,9 @@ class Syro
     def run(app, inbox = {})
       env[Rack::PATH_INFO] = @syro_path.curr
       env[Rack::SCRIPT_NAME] = @syro_path.prev
+      env[Syro::INBOX] = inbox
 
-      halt(app.call(env, inbox))
+      halt(app.call(env))
     end
 
     def halt(response)
@@ -208,7 +211,7 @@ class Syro
     @code = code
   end
 
-  def call(env, inbox = {})
-    @deck.new(@code).call(env, inbox)
+  def call(env)
+    @deck.new(@code).call(env, env.fetch(Syro::INBOX, {}))
   end
 end
