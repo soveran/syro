@@ -37,7 +37,8 @@ app = Syro.new {
 
 The block is evaluated in a sandbox where the following methods are
 available: `env`, `req`, `res`, `inbox`, `call`, `run`, `halt`,
-`match`, `on`, `root?`, `root`,`get`, `post`, `patch` and `delete`.
+`match`, `on`, `root?`, `root`,`get`, `put`, `post`, `patch` and
+`delete`.
 
 As a recommendation, user created variables should be instance
 variables. That way they won't mix with the API methods defined in
@@ -78,6 +79,9 @@ executed only if the request is matched.
 `root`: Receives a block and calls it only if `root?` is true.
 
 `get`: Receives a block and calls it only if `root?` and `req.get?` are
+true.
+
+`put`: Receives a block and calls it only if `root?` and `req.put?` are
 true.
 
 `post`: Receives a block and calls it only if `root?` and `req.post?`
@@ -144,6 +148,10 @@ app = Syro.new {
 
       get {
         res.write "GET /users/42"
+      }
+
+      put {
+        res.write "PUT /users/42"
       }
 
       patch {
