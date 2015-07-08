@@ -1,0 +1,35 @@
+body {
+  font-family: "Crete Round", serif;
+  color: #033;
+  background-color: #ff9;
+}
+
+header {
+  margin: 60px;
+  text-align: center;
+}
+
+header h1 {
+  font-family: "Fredoka One", sans-serif;
+  font-weight: normal;
+  font-size: 10vw;
+  color: #f55;
+  text-shadow: 1px 1px #033;
+}
+
+section h2 {
+  font-weight: normal;
+  font-size: 4vw;
+  text-align: center;
+}
+
+section p {
+  font-size: 1.5vw;
+  text-align: center;
+}
+
+section a {
+  color: #033;
+  padding: 0.4vw 1vw;
+  text-decoration: none;
+}
