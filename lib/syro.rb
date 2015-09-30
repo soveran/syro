@@ -125,11 +125,15 @@ class Syro
     end
 
     def run(app, inbox = {})
+      path, script = env[Rack::PATH_INFO], env[Rack::SCRIPT_NAME]
+
       env[Rack::PATH_INFO] = @syro_path.curr
       env[Rack::SCRIPT_NAME] = @syro_path.prev
       env[Syro::INBOX] = inbox
 
       halt(app.call(env))
+    ensure
+      env[Rack::PATH_INFO], env[Rack::SCRIPT_NAME] = path, script
     end
 
     def halt(response)
