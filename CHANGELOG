@@ -1,3 +1,7 @@
+0.0.8
+
+* Reset PATH_INFO and SCRIPT_NAME after running a subapp
+
 0.0.7
 
 * Change run so that it accepts Rack applications
