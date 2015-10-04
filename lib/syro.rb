@@ -110,10 +110,14 @@ class Syro
       @syro_inbox
     end
 
+    def default_headers
+      return {}
+    end
+
     def call(env, inbox)
       @syro_env = env
       @syro_req = Rack::Request.new(env)
-      @syro_res = Syro::Response.new
+      @syro_res = Syro::Response.new(default_headers)
       @syro_path = Seg.new(env.fetch(Rack::PATH_INFO))
       @syro_inbox = inbox
 
