@@ -1,4 +1,8 @@
-* Add support for default headers in response.
+1.0.0
+
+* Yield captures as an alternative API
+
+* Add support for default headers in response
 
 0.0.8
 
