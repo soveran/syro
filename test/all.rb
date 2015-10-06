@@ -11,11 +11,19 @@ class TextualDeck < Syro::Deck
   end
 end
 
+class DefaultHeaders < Syro::Deck
+  def default_headers
+    { Rack::CONTENT_TYPE => "text/html" }
+  end
+end
+
 textual = Syro.new(TextualDeck) {
   get {
     text("GET /textual")
   }
 }
+
+default_headers = Syro.new(DefaultHeaders) { }
 
 admin = Syro.new {
   get {
@@ -137,6 +145,10 @@ app = Syro.new {
   on("textual") {
     run(textual)
   }
+
+  on("headers") {
+    run(default_headers)
+  }
 }
 
 setup do
@@ -241,4 +253,10 @@ test "custom deck" do |f|
   assert_equal "GET /textual", f.last_response.body
   assert_equal "text/plain", f.last_response.headers["Content-Type"]
   assert_equal 200, f.last_response.status
+end
+
+test "default headers" do |f|
+  f.get("/headers")
+
+  assert_equal "text/html", f.last_response.headers["Content-Type"]
 end

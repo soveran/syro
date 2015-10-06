@@ -1,3 +1,5 @@
+* Add support for default headers in response.
+
 0.0.8
 
 * Reset PATH_INFO and SCRIPT_NAME after running a subapp
