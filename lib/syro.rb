@@ -155,7 +155,7 @@ class Syro
 
     def on(arg)
       if match(arg)
-        yield
+        yield(inbox[arg])
 
         halt(res.finish)
       end
