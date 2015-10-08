@@ -27,12 +27,34 @@ class Syro
   INBOX = "syro.inbox".freeze
 
   class Response
-    LOCATION = "Location".freeze
-    DEFAULT = "text/html".freeze
+    LOCATION = "Location".freeze # :nodoc:
+    DEFAULT = "text/html".freeze # :nodoc:
 
+    # The status of the response.
+    #
+    #     res.status = 200
+    #     res.status # => 200
+    #
     attr_accessor :status
 
+    # Returns the body of the response.
+    #
+    #     res.body
+    #     # => []
+    #
+    #     res.write("there is")
+    #     res.write("no try")
+    #
+    #     res.body
+    #     # => ["there is", "no try"]
+    #
     attr :body
+
+    # Returns a hash with the response headers.
+    #
+    #     res.headers
+    #     # => { "Content-Type" => "text/html", "Content-Length" => "42" }
+    #
     attr :headers
 
     def initialize(headers = {})
@@ -42,14 +64,37 @@ class Syro
       @length  = 0
     end
 
+    # Returns the response header corresponding to `key`.
+    #
+    #     res["Content-Type"]   # => "text/html"
+    #     res["Content-Length"] # => "42"
+    #
     def [](key)
       @headers[key]
     end
 
+    # Sets the given `value` with the header corresponding to `key`.
+    #
+    #     res["Content-Type"] = "application/json"
+    #     res["Content-Type"] # => "application/json"
+    #
     def []=(key, value)
       @headers[key] = value
     end
 
+    # Appends `str` to `body` and updates the `Content-Length` header.
+    #
+    #     res.body # => []
+    #
+    #     res.write("foo")
+    #     res.write("bar")
+    #
+    #     res.body
+    #     # => ["foo", "bar"]
+    #
+    #     res["Content-Length"]
+    #     # => 6
+    #
     def write(str)
       s = str.to_s
 
@@ -58,11 +103,42 @@ class Syro
       @body << s
     end
 
+    # Sets the `Location` header to `path` and updates the status to
+    # `status`. By default, `status` is `302`.
+    #
+    #     res.redirect("/path")
+    #
+    #     res["Location"] # => "/path"
+    #     res.status      # => 302
+    #
+    #     res.redirect("http://syro.ru", 303)
+    #
+    #     res["Location"] # => "http://syro.ru"
+    #     res.status      # => 303
+    #
     def redirect(path, status = 302)
       @headers[LOCATION] = path
       @status = status
     end
 
+    # Returns an array with three elements: the status, headers and body.
+    # If the status is not set, the status is set to 404 if empty body,
+    # otherwise the status is set to 200 and updates the `Content-Type`
+    # header to `text/html`.
+    #
+    #     res.status = 200
+    #     res.finish
+    #     # => [200, {}, []]
+    #
+    #     res.status = nil
+    #     res.finish
+    #     # => [404, {}, []]
+    #
+    #     res.status = nil
+    #     res.write("syro")
+    #     res.finish
+    #     # => [200, { "Content-Type" => "text/html" }, ["syro"]]
+    #
     def finish
       if @status.nil?
         if @body.empty?
@@ -76,10 +152,39 @@ class Syro
       [@status, @headers, @body]
     end
 
+    # Sets a cookie into the response.
+    #
+    #     res.set_cookie("foo", "bar")
+    #     res["Set-Cookie"] # => "foo=bar"
+    #
+    #     res.set_cookie("foo2", "bar2")
+    #     res["Set-Cookie"] # => "foo=bar\nfoo2=bar2"
+    #
+    #     res.set_cookie("bar", {
+    #       domain: ".example.com",
+    #       path: "/",
+    #       # max_age: 0,
+    #       # expires: Time.now + 10_000,
+    #       secure: true,
+    #       httponly: true,
+    #       value: "bar"
+    #     })
+    #
+    #     res["Set-Cookie"].split("\n").last
+    #     # => "bar=bar; domain=.example.com; path=/; secure; HttpOnly
+    #
+    # **NOTE:** This method doesn't sign and/or encrypt the value of the cookie.
+    #
     def set_cookie(key, value)
       Rack::Utils.set_cookie_header!(@headers, key, value)
     end
 
+    # Deletes cookie.
+    #
+    #     res.set_cookie("foo", "bar")
+    #     res["Set-Cookie"]
+    #     # => "foo=; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 -0000"
+    #
     def delete_cookie(key, value = {})
       Rack::Utils.delete_cookie_header!(@headers, key, value)
     end
