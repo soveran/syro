@@ -1,3 +1,5 @@
+require "json"
+
 class RackApp
   def call(env)
     [200, {"Content-Type" => "text/html"}, ["GET /rack"]]
@@ -17,6 +19,28 @@ class DefaultHeaders < Syro::Deck
   end
 end
 
+class CustomRequestAndResponse < Syro::Deck
+  class JSONRequest < Rack::Request
+    def params
+      JSON.parse(body.read)
+    end
+  end
+
+  class JSONResponse < Syro::Response
+    def write(s)
+      super(JSON.generate(s))
+    end
+  end
+
+  def request_class
+    JSONRequest
+  end
+
+  def response_class
+    JSONResponse
+  end
+end
+
 textual = Syro.new(TextualDeck) {
   get {
     text("GET /textual")
@@ -24,6 +48,14 @@ textual = Syro.new(TextualDeck) {
 }
 
 default_headers = Syro.new(DefaultHeaders) { }
+
+json = Syro.new(CustomRequestAndResponse) {
+  root {
+    params = req.params
+
+    res.write(params)
+  }
+}
 
 admin = Syro.new {
   get {
@@ -155,6 +187,10 @@ app = Syro.new {
   on("headers") {
     run(default_headers)
   }
+
+  on("json") {
+    run(json)
+  }
 }
 
 setup do
@@ -269,4 +305,12 @@ test "default headers" do |f|
   f.get("/headers")
 
   assert_equal "text/html", f.last_response.headers["Content-Type"]
+end
+
+test "custom request and response class" do |f|
+  params = JSON.generate(foo: "foo")
+
+  f.post("/json", params)
+
+  assert_equal params, f.last_response.body
 end
