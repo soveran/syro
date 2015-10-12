@@ -19,7 +19,9 @@ class DefaultHeaders < Syro::Deck
   end
 end
 
-class CustomRequestAndResponse < Syro::Deck
+class CustomRequestAndResponse
+  include Syro::Deck::Methods
+
   class JSONRequest < Rack::Request
     def params
       JSON.parse(body.read)
