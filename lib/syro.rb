@@ -191,140 +191,144 @@ class Syro
   end
 
   class Deck
-    def initialize(code)
-      @syro_code = code
-    end
+    module Methods
+      def initialize(code)
+        @syro_code = code
+      end
 
-    def env
-      @syro_env
-    end
+      def env
+        @syro_env
+      end
 
-    def req
-      @syro_req
-    end
+      def req
+        @syro_req
+      end
 
-    def res
-      @syro_res
-    end
+      def res
+        @syro_res
+      end
 
-    def path
-      @syro_path
-    end
+      def path
+        @syro_path
+      end
 
-    def inbox
-      @syro_inbox
-    end
+      def inbox
+        @syro_inbox
+      end
 
-    def default_headers
-      return {}
-    end
+      def default_headers
+        return {}
+      end
 
-    def request_class
-      Rack::Request
-    end
+      def request_class
+        Rack::Request
+      end
 
-    def response_class
-      Syro::Response
-    end
+      def response_class
+        Syro::Response
+      end
 
-    def call(env, inbox)
-      @syro_env = env
-      @syro_req = request_class.new(env)
-      @syro_res = response_class.new(default_headers)
-      @syro_path = Seg.new(env.fetch(Rack::PATH_INFO))
-      @syro_inbox = inbox
+      def call(env, inbox)
+        @syro_env = env
+        @syro_req = request_class.new(env)
+        @syro_res = response_class.new(default_headers)
+        @syro_path = Seg.new(env.fetch(Rack::PATH_INFO))
+        @syro_inbox = inbox
 
-      catch(:halt) do
-        instance_eval(&@syro_code)
+        catch(:halt) do
+          instance_eval(&@syro_code)
 
-        @syro_res.finish
+          @syro_res.finish
+        end
+      end
+
+      def run(app, inbox = {})
+        path, script = env[Rack::PATH_INFO], env[Rack::SCRIPT_NAME]
+
+        env[Rack::PATH_INFO] = @syro_path.curr
+        env[Rack::SCRIPT_NAME] = @syro_path.prev
+        env[Syro::INBOX] = inbox
+
+        halt(app.call(env))
+      ensure
+        env[Rack::PATH_INFO], env[Rack::SCRIPT_NAME] = path, script
+      end
+
+      def halt(response)
+        throw(:halt, response)
+      end
+
+      def match(arg)
+        case arg
+        when String then @syro_path.consume(arg)
+        when Symbol then @syro_path.capture(arg, inbox)
+        when true   then true
+        else false
+        end
+      end
+
+      def on(arg)
+        if match(arg)
+          yield(inbox[arg])
+
+          halt(res.finish)
+        end
+      end
+
+      def root?
+        @syro_path.root?
+      end
+
+      def root
+        if root?
+          yield
+
+          halt(res.finish)
+        end
+      end
+
+      def get
+        if root? && req.get?
+          yield
+
+          halt(res.finish)
+        end
+      end
+
+      def put
+        if root? && req.put?
+          yield
+
+          halt(res.finish)
+        end
+      end
+
+      def post
+        if root? && req.post?
+          yield
+
+          halt(res.finish)
+        end
+      end
+
+      def patch
+        if root? && req.patch?
+          yield
+
+          halt(res.finish)
+        end
+      end
+
+      def delete
+        if root? && req.delete?
+          yield
+
+          halt(res.finish)
+        end
       end
     end
 
-    def run(app, inbox = {})
-      path, script = env[Rack::PATH_INFO], env[Rack::SCRIPT_NAME]
-
-      env[Rack::PATH_INFO] = @syro_path.curr
-      env[Rack::SCRIPT_NAME] = @syro_path.prev
-      env[Syro::INBOX] = inbox
-
-      halt(app.call(env))
-    ensure
-      env[Rack::PATH_INFO], env[Rack::SCRIPT_NAME] = path, script
-    end
-
-    def halt(response)
-      throw(:halt, response)
-    end
-
-    def match(arg)
-      case arg
-      when String then @syro_path.consume(arg)
-      when Symbol then @syro_path.capture(arg, inbox)
-      when true   then true
-      else false
-      end
-    end
-
-    def on(arg)
-      if match(arg)
-        yield(inbox[arg])
-
-        halt(res.finish)
-      end
-    end
-
-    def root?
-      @syro_path.root?
-    end
-
-    def root
-      if root?
-        yield
-
-        halt(res.finish)
-      end
-    end
-
-    def get
-      if root? && req.get?
-        yield
-
-        halt(res.finish)
-      end
-    end
-
-    def put
-      if root? && req.put?
-        yield
-
-        halt(res.finish)
-      end
-    end
-
-    def post
-      if root? && req.post?
-        yield
-
-        halt(res.finish)
-      end
-    end
-
-    def patch
-      if root? && req.patch?
-        yield
-
-        halt(res.finish)
-      end
-    end
-
-    def delete
-      if root? && req.delete?
-        yield
-
-        halt(res.finish)
-      end
-    end
+    include Methods
   end
 
   def initialize(deck = Deck, &code)
