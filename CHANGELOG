@@ -1,3 +1,9 @@
+1.1.0
+
+* Move Deck methods to the Deck::API module
+
+* Add support for custom response and request classes
+
 1.0.0
 
 * Yield captures as an alternative API
