@@ -36,9 +36,9 @@ app = Syro.new {
 ```
 
 The block is evaluated in a sandbox where the following methods are
-available: `env`, `req`, `res`, `inbox`, `call`, `run`, `halt`,
-`match`, `on`, `root?`, `root`,`get`, `put`, `post`, `patch` and
-`delete`.
+available: `env`, `req`, `res`, `path`, `inbox`, `call`, `run`,
+`halt`, `match`, `on`, `root?`, `root`,`get`, `put`, `post`, `patch`
+and `delete`.
 
 As a recommendation, user created variables should be instance
 variables. That way they won't mix with the API methods defined in
@@ -55,6 +55,8 @@ instance of `Rack::Request`.
 
 `res`: Helper object for creating the response. It's an instance
 of `Syro::Response`.
+
+`path`: Helper object that tracks the previous and current path.
 
 `inbox`: Hash with captures and potentially other variables local
 to the request.
