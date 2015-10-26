@@ -3,6 +3,12 @@ Syro
 
 Simple router for web applications.
 
+Community
+---------
+
+Meet us on IRC: [#syro](irc://chat.freenode.net/#syro) on
+[freenode.net](http://freenode.net/).
+
 Description
 -----------
 
@@ -13,8 +19,13 @@ by the way some Cuba applications are architected: modularity is
 encouraged and sub-applications can be dispatched without any
 significant performance overhead.
 
+Check the [website][syro] for more information, and follow the
+[tutorial][tutorial] for a step by step introduction.
+
 [rum]: http://github.com/chneukirchen/rum
 [cuba]: http://cuba.is
+[syro]: http://soveran.github.io/syro/
+[tutorial]: http://files.soveran.com/syro/
 
 Usage
 -----
