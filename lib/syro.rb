@@ -280,51 +280,27 @@ class Syro
       end
 
       def root
-        if root?
-          yield
-
-          halt(res.finish)
-        end
+        on(root?) { yield }
       end
 
       def get
-        if root? && req.get?
-          yield
-
-          halt(res.finish)
-        end
+        root { yield } if req.get?
       end
 
       def put
-        if root? && req.put?
-          yield
-
-          halt(res.finish)
-        end
+        root { yield } if req.put?
       end
 
       def post
-        if root? && req.post?
-          yield
-
-          halt(res.finish)
-        end
+        root { yield } if req.post?
       end
 
       def patch
-        if root? && req.patch?
-          yield
-
-          halt(res.finish)
-        end
+        root { yield } if req.patch?
       end
 
       def delete
-        if root? && req.delete?
-          yield
-
-          halt(res.finish)
-        end
+        root { yield } if req.delete?
       end
     end
 
