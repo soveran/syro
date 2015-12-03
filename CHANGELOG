@@ -1,3 +1,7 @@
+1.1.1
+
+* Small internal refactoring
+
 1.1.0
 
 * Move Deck methods to the Deck::API module
