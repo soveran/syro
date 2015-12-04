@@ -48,8 +48,10 @@ app = Syro.new {
 
 The block is evaluated in a sandbox where the following methods are
 available: `env`, `req`, `res`, `path`, `inbox`, `call`, `run`,
-`halt`, `match`, `on`, `root?`, `root`,`get`, `put`, `post`, `patch`
-and `delete`.
+`halt`, `consume`, `capture`, `root?` `match`, `default`, `on`,
+`root`,`get`, `put`, `post`, `patch` and `delete`. Three other
+methods are available for customizations: `default_headers`,
+`request_class` and `response_class`.
 
 As a recommendation, user created variables should be instance
 variables. That way they won't mix with the API methods defined in
@@ -81,13 +83,20 @@ argument.
 `halt`: Terminates the request. It receives an array with the
 response as per Rack's specification.
 
+`consume`: Match and consume a path segment.
+
+`capture`: Match and capture a path segment. The value is stored in
+the inbox.
+
+`root?`: Returns true if the path yet to be consumed is empty.
+
 `match`: Receives a String, a Symbol or a boolean, and returns true
 if it matches the request.
 
+`default`: Receives a block that will be executed inconditionally.
+
 `on`: Receives a value to be matched, and a block that will be
 executed only if the request is matched.
-
-`root?`: Returns true if the path yet to be consumed is empty.
 
 `root`: Receives a block and calls it only if `root?` is true.
 
