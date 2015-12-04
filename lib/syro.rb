@@ -258,6 +258,10 @@ class Syro
         throw(:halt, response)
       end
 
+      def root?
+        @syro_path.root?
+      end
+
       def match(arg)
         case arg
         when String then @syro_path.consume(arg)
@@ -267,20 +271,16 @@ class Syro
         end
       end
 
-      def on(arg)
-        if match(arg)
-          yield(inbox[arg])
-
-          halt(res.finish)
-        end
+      def default
+        yield; halt(res.finish)
       end
 
-      def root?
-        @syro_path.root?
+      def on(arg)
+        default { yield } if match(arg)
       end
 
       def root
-        on(root?) { yield }
+        default { yield } if root?
       end
 
       def get
