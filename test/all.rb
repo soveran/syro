@@ -146,12 +146,6 @@ app = Syro.new {
     }
   }
 
-  on("articles") {
-    on(:id) { |id|
-      res.write(sprintf("GET /articles/%s", id))
-    }
-  }
-
   on("posts") {
     @path = path.prev
 
@@ -252,10 +246,6 @@ end
 test "captures" do |f|
   f.get("/users/42")
   assert_equal "GET /users/42", f.last_response.body
-  assert_equal 200, f.last_response.status
-
-  f.get("/articles/23")
-  assert_equal "GET /articles/23", f.last_response.body
   assert_equal 200, f.last_response.status
 end
 

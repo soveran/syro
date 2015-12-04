@@ -258,14 +258,22 @@ class Syro
         throw(:halt, response)
       end
 
+      def consume(arg)
+        @syro_path.consume(arg)
+      end
+
+      def capture(arg)
+        @syro_path.capture(arg, inbox)
+      end
+
       def root?
         @syro_path.root?
       end
 
       def match(arg)
         case arg
-        when String then @syro_path.consume(arg)
-        when Symbol then @syro_path.capture(arg, inbox)
+        when String then consume(arg)
+        when Symbol then capture(arg)
         when true   then true
         else false
         end
