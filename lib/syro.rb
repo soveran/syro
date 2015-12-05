@@ -24,7 +24,7 @@ require "rack"
 require "seg"
 
 class Syro
-  INBOX = "syro.inbox".freeze
+  INBOX = "syro.inbox".freeze # :nodoc:
 
   class Response
     LOCATION = "Location".freeze # :nodoc:
@@ -203,11 +203,25 @@ class Syro
       def env
         @syro_env
       end
-
+      
+      # Returns the incoming request object. This object is an
+      # instance of Rack::Request.
+      #
+      #     req.post?      # => true
+      #     req.params     # => { "username" => "bob", "password" => "secret" }
+      #     req[:username] # => "bob"
+      #
       def req
         @syro_req
       end
 
+      # Returns the current response object. This object is an
+      # instance of Syro::Response.
+      #
+      #     res.status = 200
+      #     res["Content-Type"] = "text/html"
+      #     res.write("<h1>Welcome back!</h1>")
+      # 
       def res
         @syro_res
       end
@@ -221,7 +235,7 @@ class Syro
       end
 
       def default_headers
-        return {}
+        {}
       end
 
       def request_class
@@ -258,6 +272,13 @@ class Syro
         env[Rack::PATH_INFO], env[Rack::SCRIPT_NAME] = path, script
       end
 
+      # Immediately stops the request and returns `response`
+      # as per Rack's specification.
+      #
+      #     halt([200, { "Content-Type" => "text/html" }, ["hello"]])
+      #     halt([res.status, res.headers, res.body])
+      #     halt(res.finish)
+      #
       def halt(response)
         throw(:halt, response)
       end
