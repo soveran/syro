@@ -179,9 +179,13 @@ class Syro
       Rack::Utils.set_cookie_header!(@headers, key, value)
     end
 
-    # Deletes cookie.
+    # Deletes given cookie.
     #
     #     res.set_cookie("foo", "bar")
+    #     res["Set-Cookie"]
+    #     # => "foo=bar"
+    #
+    #     res.delete_cookie("foo")
     #     res["Set-Cookie"]
     #     # => "foo=; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 -0000"
     #
