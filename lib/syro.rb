@@ -48,14 +48,14 @@ class Syro
     #     res.body
     #     # => ["there is", "no try"]
     #
-    attr :body
+    attr_reader :body
 
     # Returns a hash with the response headers.
     #
     #     res.headers
     #     # => { "Content-Type" => "text/html", "Content-Length" => "42" }
     #
-    attr :headers
+    attr_reader :headers
 
     def initialize(headers = {})
       @status  = nil
