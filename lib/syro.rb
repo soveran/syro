@@ -203,7 +203,7 @@ class Syro
       def env
         @syro_env
       end
-      
+
       # Returns the incoming request object. This object is an
       # instance of Rack::Request.
       #
