@@ -324,6 +324,10 @@ class Syro
         root { yield } if req.put?
       end
 
+      def head
+        root { yield } if req.head?
+      end
+
       def post
         root { yield } if req.post?
       end
@@ -334,6 +338,10 @@ class Syro
 
       def delete
         root { yield } if req.delete?
+      end
+
+      def options
+        root { yield } if req.options?
       end
     end
 

@@ -49,8 +49,8 @@ app = Syro.new {
 The block is evaluated in a sandbox where the following methods are
 available: `env`, `req`, `res`, `path`, `inbox`, `call`, `run`,
 `halt`, `consume`, `capture`, `root?` `match`, `default`, `on`,
-`root`,`get`, `put`, `post`, `patch` and `delete`. Three other
-methods are available for customizations: `default_headers`,
+`root`,`get`, `put`, `head`, `post`, `patch`, `delete` and `options`.
+Three other methods are available for customizations: `default_headers`,
 `request_class` and `response_class`.
 
 As a recommendation, user created variables should be instance
@@ -106,6 +106,9 @@ true.
 `put`: Receives a block and calls it only if `root?` and `req.put?` are
 true.
 
+`head`: Receives a block and calls it only if `root?` and `req.head?`
+are true.
+
 `post`: Receives a block and calls it only if `root?` and `req.post?`
 are true.
 
@@ -114,6 +117,9 @@ are true.
 
 `delete`: Receives a block and calls it only if `root?` and `req.delete?`
 are true.
+
+`options`: Receives a block and calls it only if `root?` and
+`req.options?` are true.
 
 Decks
 -----

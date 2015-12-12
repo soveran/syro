@@ -108,6 +108,10 @@ app = Syro.new {
         res.write("PUT /foo/bar")
       }
 
+      head {
+        res.write("HEAD /foo/bar")
+      }
+
       post {
         res.write("POST /foo/bar")
       }
@@ -118,6 +122,10 @@ app = Syro.new {
 
       delete {
         res.write("DELETE /foo/bar")
+      }
+
+      options {
+        res.write("OPTIONS /foo/bar")
       }
     }
   }
@@ -200,6 +208,10 @@ test "path + verb" do |f|
   assert_equal 200, f.last_response.status
   assert_equal "PUT /foo/bar", f.last_response.body
 
+  f.head("/foo/bar")
+  assert_equal 200, f.last_response.status
+  assert_equal "HEAD /foo/bar", f.last_response.body
+
   f.post("/foo/bar")
   assert_equal 200, f.last_response.status
   assert_equal "POST /foo/bar", f.last_response.body
@@ -211,6 +223,10 @@ test "path + verb" do |f|
   f.delete("/foo/bar")
   assert_equal 200, f.last_response.status
   assert_equal "DELETE /foo/bar", f.last_response.body
+
+  f.options("/foo/bar")
+  assert_equal 200, f.last_response.status
+  assert_equal "OPTIONS /foo/bar", f.last_response.body
 end
 
 test "verbs match only on root" do |f|
