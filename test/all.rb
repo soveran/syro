@@ -41,159 +41,159 @@ class CustomRequestAndResponse < Syro::Deck
   end
 end
 
-textual = Syro.new(TextualDeck) {
-  get {
+textual = Syro.new(TextualDeck) do
+  get do
     text("GET /textual")
-  }
-}
+  end
+end
 
-default_headers = Syro.new(DefaultHeaders) { }
+default_headers = Syro.new(DefaultHeaders) do end
 
-json = Syro.new(CustomRequestAndResponse) {
-  root {
+json = Syro.new(CustomRequestAndResponse) do
+  root do
     params = req.params
 
     res.write(params)
-  }
-}
+  end
+end
 
-admin = Syro.new {
-  get {
+admin = Syro.new do
+  get do
     res.write("GET /admin")
-  }
-}
+  end
+end
 
-platforms = Syro.new {
+platforms = Syro.new do
   @id = inbox.fetch(:id)
 
-  get {
+  get do
     res.write "GET /platforms/#{@id}"
-  }
-}
+  end
+end
 
-comments = Syro.new {
-  get {
+comments = Syro.new do
+  get do
     res.write sprintf("GET %s/%s/comments",
       inbox[:path],
       inbox[:post_id])
-  }
-}
+  end
+end
 
-app = Syro.new {
-  get {
+app = Syro.new do
+  get do
     res.write "GET /"
-  }
+  end
 
-  post {
-    on(req.POST["user"] != nil) {
+  post do
+    on req.POST["user"] != nil do
       res.write "POST / (user)"
-    }
+    end
 
-    on(true) {
+    on true do
       res.write "POST / (none)"
-    }
-  }
+    end
+  end
 
-  on("foo") {
-    on("bar") {
-      on("baz") {
+  on "foo" do
+    on "bar" do
+      on "baz" do
         res.write("error")
-      }
+      end
 
-      get {
+      get do
         res.write("GET /foo/bar")
-      }
+      end
 
-      put {
+      put do
         res.write("PUT /foo/bar")
-      }
+      end
 
-      head {
+      head do
         res.write("HEAD /foo/bar")
-      }
+      end
 
-      post {
+      post do
         res.write("POST /foo/bar")
-      }
+      end
 
-      patch {
+      patch do
         res.write("PATCH /foo/bar")
-      }
+      end
 
-      delete {
+      delete do
         res.write("DELETE /foo/bar")
-      }
+      end
 
-      options {
+      options do
         res.write("OPTIONS /foo/bar")
-      }
-    }
-  }
+      end
+    end
+  end
 
-  on("bar/baz") {
-    get {
+  on "bar/baz" do
+    get do
       res.write("GET /bar/baz")
-    }
-  }
+    end
+  end
 
-  on("admin") {
+  on "admin" do
     run(admin)
-  }
+  end
 
-  on("platforms") {
+  on "platforms" do
     run(platforms, id: 42)
-  }
+  end
 
-  on("rack") {
+  on "rack" do
     run(RackApp.new)
-  }
+  end
 
-  on("users") {
-    on(:id) {
+  on "users" do
+    on :id do
       res.write(sprintf("GET /users/%s", inbox[:id]))
-    }
-  }
+    end
+  end
 
-  on("posts") {
+  on "posts" do
     @path = path.prev
 
-    on(:post_id) {
-      on("comments") {
+    on :post_id do
+      on "comments" do
         run(comments, inbox.merge(path: @path))
-      }
-    }
-  }
+      end
+    end
+  end
 
-  on("one") {
+  on "one" do
     @one = "1"
 
-    get {
+    get do
       res.write(@one)
-    }
-  }
+    end
+  end
 
-  on("two") {
-    get {
+  on "two" do
+    get do
       res.write(@one)
-    }
+    end
 
-    post {
+    post do
       res.redirect("/one")
-    }
-  }
+    end
+  end
 
-  on("textual") {
+  on "textual" do
     run(textual)
-  }
+  end
 
-  on("headers") {
+  on "headers" do
     run(default_headers)
-  }
+  end
 
-  on("json") {
+  on "json" do
     run(json)
-  }
-}
+  end
+end
 
 setup do
   Driver.new(app)

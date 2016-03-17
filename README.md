@@ -33,17 +33,17 @@ Usage
 An example of a modular application would look like this:
 
 ```ruby
-admin = Syro.new {
-  get {
+Admin = Syro.new do
+  get do
     res.write "Hello from admin!"
-  }
-}
+  end
+end
 
-app = Syro.new {
-  on("admin") {
-    run(admin)
-  }
-}
+App = Syro.new do
+  on "admin" do
+    run(Admin)
+  end
+end
 ```
 
 The block is evaluated in a sandbox where the following methods are
@@ -138,11 +138,11 @@ class TextualDeck < Syro::Deck
   end
 end
 
-App = Syro.new(TextualDeck) {
-  get {
+App = Syro.new(TextualDeck) do
+  get do
     text("hello world")
-  }
-}
+  end
+end
 ```
 
 The example is simple enough to showcase the concept, but maybe too
@@ -159,47 +159,47 @@ In the following examples, the response string represents
 the request path that was sent.
 
 ```ruby
-app = Syro.new {
-  get {
+App = Syro.new do
+  get do
     res.write "GET /"
-  }
+  end
 
-  post {
+  post do
     res.write "POST /"
-  }
+  end
 
-  on("users") {
-    on(:id) {
+  on "users" do
+    on :id do
 
       # Captured values go to the inbox
       @user = User[inbox[:id]]
 
-      get {
+      get do
         res.write "GET /users/42"
-      }
+      end
 
-      put {
+      put do
         res.write "PUT /users/42"
-      }
+      end
 
-      patch {
+      patch do
         res.write "PATCH /users/42"
-      }
+      end
 
-      delete {
+      delete do
         res.write "DELETE /users/42"
-      }
-    }
+      end
+    end
 
-    get {
+    get do
       res.write "GET /users"
-    }
+    end
 
-    post {
+    post do
       res.write "POST /users"
-    }
-  }
-}
+    end
+  end
+end
 ```
 
 Matches
@@ -234,9 +234,9 @@ a slash and until either another slash or the end of the string.
 The captured value is stored in the `inbox` hash under the key that
 was provided as the argument to `on`. For example, after a call to
 `on(:user_id)`, the value for the segment will be stored at
-`inbox[:user_id]`. When mounting an application called `users` with
-the command `run(users)`, an inbox can be provided as the second
-argument: `run(users, inbox)`. That allows apps to share previous
+`inbox[:user_id]`. When mounting an application called `Users` with
+the command `run(Users)`, an inbox can be provided as the second
+argument: `run(Users, inbox)`. That allows apps to share previous
 captures.
 
 Security
@@ -259,15 +259,15 @@ Syro doesn't support Rack middleware out of the box. If you need them,
 just use `Rack::Builder`:
 
 ```ruby
-app = Rack::Builder.new do
+App = Rack::Builder.new do
 
   use Rack::Session::Cookie, secret: "..."
 
-  run Syro.new {
-    get {
+  run Syro.new do
+    get do
       res.write("Hello, world")
-    }
-  }
+    end
+  end
 
 end
 ```
