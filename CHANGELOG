@@ -1,3 +1,7 @@
+2.1.1
+
+* Change gemspec to accept pre-release versions of Rack 2
+
 2.1.0
 
 * Add matchers for head and options
