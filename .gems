@@ -1,4 +1,4 @@
 rack -v 1.6.4
 rack-test -v 0.6.3
-cutest -v 1.2.2
+cutest -v 1.2.3
 seg -v 0.0.1
