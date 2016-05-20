@@ -193,6 +193,11 @@ app = Syro.new do
   on "json" do
     run(json)
   end
+
+  on "private" do
+    res.status = 401
+    res.write("Unauthorized")
+  end
 end
 
 setup do
@@ -319,4 +324,12 @@ test "custom request and response class" do |f|
   f.post("/json", params)
 
   assert_equal params, f.last_response.body
+end
+
+test "set content type if body is set" do |f|
+  f.get("/private")
+
+  assert_equal 401, f.last_response.status
+  assert_equal "Unauthorized", f.last_response.body
+  assert_equal "text/html", f.last_response.headers["Content-Type"]
 end

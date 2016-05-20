@@ -140,13 +140,10 @@ class Syro
     #     # => [200, { "Content-Type" => "text/html" }, ["syro"]]
     #
     def finish
-      if @status.nil?
-        if @body.empty?
-          @status = 404
-        else
-          @headers[Rack::CONTENT_TYPE] ||= DEFAULT
-          @status = 200
-        end
+      @status ||= (@body.empty?) ? 404 : 200
+
+      if @body.any?
+        @headers[Rack::CONTENT_TYPE] ||= DEFAULT
       end
 
       [@status, @headers, @body]
@@ -221,7 +218,7 @@ class Syro
       #     res.status = 200
       #     res["Content-Type"] = "text/html"
       #     res.write("<h1>Welcome back!</h1>")
-      # 
+      #
       def res
         @syro_res
       end
