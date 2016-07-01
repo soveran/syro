@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name              = "syro"
-  s.version           = "2.1.2"
+  s.version           = "2.2.0"
   s.summary           = "Simple router"
   s.description       = "Simple router for web applications"
   s.authors           = ["Michel Martens"]
@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.files = `git ls-files`.split("\n")
 
   s.add_dependency "seg"
-  s.add_dependency "rack", ">= 1.6.0", "< 2.0.0"
+  s.add_dependency "rack", ">= 1.6.0"
   s.add_development_dependency "cutest"
   s.add_development_dependency "rack-test"
 end
