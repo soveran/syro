@@ -210,8 +210,8 @@ test "path + verb" do |f|
   assert_equal "GET /foo/bar", f.last_response.body
 
   f.get("/bar/baz")
-  assert_equal 200, f.last_response.status
-  assert_equal "GET /bar/baz", f.last_response.body
+  assert_equal 404, f.last_response.status
+  assert_equal "", f.last_response.body
 
   f.put("/foo/bar")
   assert_equal 200, f.last_response.status
