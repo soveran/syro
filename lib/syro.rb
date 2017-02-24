@@ -28,7 +28,12 @@ class Syro
 
   class Response
     LOCATION = "Location".freeze # :nodoc:
-    DEFAULT = "text/html".freeze # :nodoc:
+
+    module ContentType
+      HTML = "text/html".freeze        # :nodoc:
+      TEXT = "text/plain".freeze       # :nodoc:
+      JSON = "application/json".freeze # :nodoc:
+    end
 
     # The status of the response.
     #
@@ -101,6 +106,24 @@ class Syro
       @length += s.bytesize
       @headers[Rack::CONTENT_LENGTH] = @length.to_s
       @body << s
+    end
+
+    # Write response body as text/plain
+    def text(str)
+      @headers[Rack::CONTENT_TYPE] = ContentType::TEXT
+      write(str)
+    end
+
+    # Write response body as text/html
+    def html(str)
+      @headers[Rack::CONTENT_TYPE] = ContentType::HTML
+      write(str)
+    end
+
+    # Write response body as application/json
+    def json(str)
+      @headers[Rack::CONTENT_TYPE] = ContentType::JSON
+      write(str)
     end
 
     # Sets the `Location` header to `path` and updates the status to

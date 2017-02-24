@@ -254,6 +254,46 @@ post do
 end
 ```
 
+Content type
+------------
+
+There's no default value for the content type header, but there's
+a handy way of setting the desired value.
+
+In order to write the body of the response, the `res.write` method
+is used:
+
+```ruby
+res.write "hello world"
+```
+
+It has the drawback of leaving the `Content-Type` header empty.
+Three alternative methods are provided, and more can be added by
+using custom Decks.
+
+Setting the Content-Type as `"text/plain"`:
+
+```ruby
+res.text "hello world"
+```
+
+Setting the Content-Type as `"text/html"`:
+
+```ruby
+res.html "hello world"
+```
+
+Setting the Content-Type as `"application/json"`:
+
+```ruby
+res.json "hello world"
+```
+
+Note that aside from writing the response body and setting the value
+for the Content-Type header, no encoding or serialization takes
+place. If you want to return a JSON encoded response, make sure to
+encode the objects yourself (i.e., `res.json JSON.dump(...)`).
+
 Security
 --------
 
@@ -275,7 +315,6 @@ just use `Rack::Builder`:
 
 ```ruby
 App = Rack::Builder.new do
-
   use Rack::Session::Cookie, secret: "..."
 
   run Syro.new do
@@ -283,7 +322,6 @@ App = Rack::Builder.new do
       res.write("Hello, world")
     end
   end
-
 end
 ```
 

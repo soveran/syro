@@ -6,9 +6,9 @@ class RackApp
   end
 end
 
-class TextualDeck < Syro::Deck
-  def text(str)
-    res[Rack::CONTENT_TYPE] = "text/plain"
+class MarkdownDeck < Syro::Deck
+  def markdown(str)
+    res[Rack::CONTENT_TYPE] = "text/markdown"
     res.write(str)
   end
 end
@@ -41,9 +41,9 @@ class CustomRequestAndResponse < Syro::Deck
   end
 end
 
-textual = Syro.new(TextualDeck) do
+markdown = Syro.new(MarkdownDeck) do
   get do
-    text("GET /textual")
+    markdown("GET /markdown")
   end
 end
 
@@ -182,21 +182,37 @@ app = Syro.new do
     end
   end
 
-  on "textual" do
-    run(textual)
+  on "markdown" do
+    run(markdown)
   end
 
   on "headers" do
     run(default_headers)
   end
 
-  on "json" do
+  on "custom" do
     run(json)
   end
 
   on "private" do
     res.status = 401
     res.write("Unauthorized")
+  end
+
+  on "write" do
+    res.write "nil!"
+  end
+
+  on "text" do
+    res.text "plain!"
+  end
+
+  on "html" do
+    res.html "html!"
+  end
+
+  on "json" do
+    res.json "json!"
   end
 end
 
@@ -312,9 +328,9 @@ test "redirect" do |f|
 end
 
 test "custom deck" do |f|
-  f.get("/textual")
-  assert_equal "GET /textual", f.last_response.body
-  assert_equal "text/plain", f.last_response.headers["Content-Type"]
+  f.get("/markdown")
+  assert_equal "GET /markdown", f.last_response.body
+  assert_equal "text/markdown", f.last_response.headers["Content-Type"]
   assert_equal 200, f.last_response.status
 end
 
@@ -327,15 +343,29 @@ end
 test "custom request and response class" do |f|
   params = JSON.generate(foo: "foo")
 
-  f.post("/json", params)
+  f.post("/custom", params)
 
   assert_equal params, f.last_response.body
 end
 
-test "set content type if body is set" do |f|
+test "don't set content type by default" do |f|
   f.get("/private")
 
   assert_equal 401, f.last_response.status
   assert_equal "Unauthorized", f.last_response.body
+  assert_equal nil, f.last_response.headers["Content-Type"]
+end
+
+test "content type" do |f|
+  f.get("/write")
+  assert_equal nil, f.last_response.headers["Content-Type"]
+
+  f.get("/text")
+  assert_equal "text/plain", f.last_response.headers["Content-Type"]
+
+  f.get("/html")
   assert_equal "text/html", f.last_response.headers["Content-Type"]
+
+  f.get("/json")
+  assert_equal "application/json", f.last_response.headers["Content-Type"]
 end
