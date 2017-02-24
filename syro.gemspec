@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name              = "syro"
-  s.version           = "2.2.0"
+  s.version           = "3.0.0"
   s.summary           = "Simple router"
   s.description       = "Simple router for web applications"
   s.authors           = ["Michel Martens"]
