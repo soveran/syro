@@ -271,7 +271,9 @@ end
 test "captures" do |f|
   f.get("/users/42")
   assert_equal "GET /users/42", f.last_response.body
-  assert_equal 200, f.last_response.status
+
+  # As the verb was not mached, the status is 404.
+  assert_equal 404, f.last_response.status
 end
 
 test "post values" do |f|

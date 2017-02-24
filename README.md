@@ -239,6 +239,21 @@ the command `run(Users)`, an inbox can be provided as the second
 argument: `run(Users, inbox)`. That allows apps to share previous
 captures.
 
+Status code
+-----------
+
+By default the status code is set to `404`. If both path and request
+method are matched, the status is automatically changed to `200`.
+You can change the status code by assigning a number to `res.status`,
+for example:
+
+```ruby
+post do
+  ...
+  res.status = 201
+end
+```
+
 Security
 --------
 

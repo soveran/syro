@@ -58,7 +58,7 @@ class Syro
     attr_reader :headers
 
     def initialize(headers = {})
-      @status  = nil
+      @status  = 404
       @headers = headers
       @body    = []
       @length  = 0
@@ -121,10 +121,10 @@ class Syro
       @status = status
     end
 
-    # Returns an array with three elements: the status, headers and body.
-    # If the status is not set, the status is set to 404 if empty body,
-    # otherwise the status is set to 200 and updates the `Content-Type`
-    # header to `text/html`.
+    # Returns an array with three elements: the status, headers and
+    # body. If the status is not set, the status is set to 404. If
+    # a match is found for both path and request method, the status
+    # is changed to 200.
     #
     #     res.status = 200
     #     res.finish
@@ -140,12 +140,6 @@ class Syro
     #     # => [200, { "Content-Type" => "text/html" }, ["syro"]]
     #
     def finish
-      @status ||= (@body.empty?) ? 404 : 200
-
-      if @body.any?
-        @headers[Rack::CONTENT_TYPE] ||= DEFAULT
-      end
-
       [@status, @headers, @body]
     end
 
@@ -314,31 +308,31 @@ class Syro
       end
 
       def get
-        root { yield } if req.get?
+        root { res.status = 200; yield } if req.get?
       end
 
       def put
-        root { yield } if req.put?
+        root { res.status = 200; yield } if req.put?
       end
 
       def head
-        root { yield } if req.head?
+        root { res.status = 200; yield } if req.head?
       end
 
       def post
-        root { yield } if req.post?
+        root { res.status = 200; yield } if req.post?
       end
 
       def patch
-        root { yield } if req.patch?
+        root { res.status = 200; yield } if req.patch?
       end
 
       def delete
-        root { yield } if req.delete?
+        root { res.status = 200; yield } if req.delete?
       end
 
       def options
-        root { yield } if req.options?
+        root { res.status = 200; yield } if req.options?
       end
     end
 
