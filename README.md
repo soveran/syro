@@ -317,11 +317,11 @@ just use `Rack::Builder`:
 App = Rack::Builder.new do
   use Rack::Session::Cookie, secret: "..."
 
-  run Syro.new do
+  run Syro.new {
     get do
       res.write("Hello, world")
     end
-  end
+  }
 end
 ```
 
