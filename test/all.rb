@@ -79,6 +79,26 @@ comments = Syro.new do
   end
 end
 
+handlers = Syro.new do
+  on "without_handler" do
+    # Not found
+  end
+
+  handle(404) do
+    res.text "Not found!"
+  end
+
+  on "with_handler" do
+    # Not found
+  end
+
+  on "with_local_handler" do
+    handle(404) do
+      res.text "Also not found!"
+    end
+  end
+end
+
 app = Syro.new do
   get do
     res.write "GET /"
@@ -192,6 +212,10 @@ app = Syro.new do
 
   on "custom" do
     run(json)
+  end
+
+  on "handlers" do
+    run(handlers)
   end
 
   on "private" do
@@ -368,4 +392,26 @@ test "content type" do |f|
 
   f.get("/json")
   assert_equal "application/json", f.last_response.headers["Content-Type"]
+end
+
+test "status code handling" do |f|
+  f.get("/handlers")
+  assert_equal 404, f.last_response.status
+  assert_equal "text/plain", f.last_response.headers["Content-Type"]
+  assert_equal "Not found!", f.last_response.body
+
+  f.get("/handlers/without_handler")
+  assert_equal 404, f.last_response.status
+  assert_equal nil, f.last_response.headers["Content-Type"]
+  assert_equal "", f.last_response.body
+
+  f.get("/handlers/with_handler")
+  assert_equal 404, f.last_response.status
+  assert_equal "text/plain", f.last_response.headers["Content-Type"]
+  assert_equal "Not found!", f.last_response.body
+
+  f.get("/handlers/with_local_handler")
+  assert_equal 404, f.last_response.status
+  assert_equal "text/plain", f.last_response.headers["Content-Type"]
+  assert_equal "Also not found!", f.last_response.body
 end

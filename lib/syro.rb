@@ -269,8 +269,7 @@ class Syro
 
         catch(:halt) do
           instance_eval(&@syro_code)
-
-          @syro_res.finish
+          finish!
         end
       end
 
@@ -297,6 +296,64 @@ class Syro
         throw(:halt, response)
       end
 
+      # Install a handler for a given status code. Once a handler is
+      # installed, it will be called by Syro before halting the
+      # request.
+      #
+      #     handle 404 do
+      #       res.text "Not found!"
+      #     end
+      #
+      # If a new handler is installed for the same status code, the
+      # previous handler is overwritten. A handler is valid in the
+      # current scope and in all its nested branches. Blocks that end
+      # before the handler is installed are not affected.
+      #
+      # For example:
+      #
+      #     on "foo" do
+      #       # Not found
+      #     end
+      #
+      #     handle 404 do
+      #       res.text "Not found!"
+      #     end
+      #
+      #     on "bar" do
+      #       # Not found
+      #     end
+      #
+      #     on "baz" do
+      #       # Not found
+      #
+      #       handle 404 do
+      #         res.text "Couldn't find baz"
+      #       end
+      #     end
+      #
+      # A request to "/foo" will return a 404, because the request
+      # method was not matched. But as the `on "foo"` block ends
+      # before the handler is installed, the result will be a blank
+      # screen. On the other hand, a request to "/bar" will return a
+      # 404 with the plain text "Not found!".
+      #
+      # Finally, a request to "/baz" will return a 404 with the plain text
+      # "Couldn't find baz", because by the time the `on "baz"` block ends
+      # a new handler is installed, and thus the previous one is overwritten.
+      #
+      # Any status code can be handled this way, even status `200`.
+      # In that case the handler will behave as a filter to be run
+      # after each successful request.
+      #
+      def handle(status, &block)
+        inbox[status] = block
+      end
+
+      def finish!
+        inbox[res.status]&.call
+        halt(res.finish)
+      end
+
       def consume(arg)
         @syro_path.consume(arg)
       end
@@ -319,7 +376,7 @@ class Syro
       end
 
       def default
-        yield; halt(res.finish)
+        yield; finish!
       end
 
       def on(arg)

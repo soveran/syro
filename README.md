@@ -48,10 +48,10 @@ end
 
 The block is evaluated in a sandbox where the following methods are
 available: `env`, `req`, `res`, `path`, `inbox`, `call`, `run`,
-`halt`, `consume`, `capture`, `root?` `match`, `default`, `on`,
-`root`,`get`, `put`, `head`, `post`, `patch`, `delete` and `options`.
-Three other methods are available for customizations: `default_headers`,
-`request_class` and `response_class`.
+`halt`, `handle`, `finish!`, `consume`, `capture`, `root?` `match`,
+`default`, `on`, `root`,`get`, `put`, `head`, `post`, `patch`,
+`delete` and `options`. Three other methods are available for
+customizations: `default_headers`, `request_class` and `response_class`.
 
 As a recommendation, user created variables should be instance
 variables. That way they won't mix with the API methods defined in
@@ -82,6 +82,12 @@ argument.
 
 `halt`: Terminates the request. It receives an array with the
 response as per Rack's specification.
+
+`handle`: Installs a handler for a given status code. It receives
+a status code and a block that will be executed from `finish!`.
+
+`finish!`: Terminates the request by executing any installed handlers
+and then halting with the current value of `res.finish`.
 
 `consume`: Match and consume a path segment.
 
@@ -253,6 +259,78 @@ post do
   res.status = 201
 end
 ```
+
+Handlers
+--------
+
+Status code handlers can be installed with the `handle` command,
+which receives a status code and a block to be executed just before
+finishing the request.
+
+By default, if there are no matches in a Syro application the
+response is a `404` with an empty body. If we decide to handle the
+`404` requests and return a string, we can do as follows:
+
+```ruby
+App = Syro.new do
+  handle 404 do
+    res.text "Not found!"
+  end
+
+  get do
+    res.text "Found!
+  end
+end
+```
+
+In this example, a `GET` request to `"/"` will return a status `200`
+with the body `"Found!"`. Any other request will return a `404`
+with the body `"Not found!"`.
+
+If a new handler is installed for the same status code, the previous
+handler is overwritten. A handler is valid in the current scope and
+in all its nested branches. Blocks that end before the handler is
+installed are not affected.
+
+This is a contrived example that shows some edge cases when using handlers:
+
+```ruby
+App = Syro.new do
+  on "foo" do
+    # 404, empty body
+  end
+
+  handle 404 do
+    res.text "Not found!"
+  end
+
+  on "bar" do
+    # 404, body is "Not found!"
+  end
+
+  on "baz" do
+    # 404, body is "Couldn't find baz"
+
+    handle 404 do
+      res.text "Couldn't find baz"
+    end
+  end
+end
+```
+
+A request to `"/foo"` will return a `404`, because the request
+method was not matched. But as the `on "foo"` block ends before the
+handler is installed, the result will be a blank screen. On the
+other hand, a request to `"/bar"` will return a `404` with the plain
+text `"Not found!"`.
+
+Finally, a request to `"/baz"` will return a `404` with the plain text
+`"Couldn't find baz"`, because by the time the `on "baz"` block ends
+a new handler is installed, and thus the previous one is overwritten.
+
+Any status code can be handled this way, even status `200`. In that
+case the handler will behave as a filter to be run after each
+successful request.
 
 Content type
 ------------
