@@ -99,6 +99,24 @@ handlers = Syro.new do
   end
 end
 
+path_info = Syro.new do
+  on "foo" do
+    get do
+      res.text req.path
+    end
+  end
+
+  get do
+    res.text req.path
+  end
+end
+
+script_name = Syro.new do
+  on "path" do
+    run(path_info)
+  end
+end
+
 app = Syro.new do
   get do
     res.write "GET /"
@@ -237,6 +255,10 @@ app = Syro.new do
 
   on "json" do
     res.json "json!"
+  end
+
+  on "script" do
+    run(script_name)
   end
 end
 
@@ -414,4 +436,10 @@ test "status code handling" do |f|
   assert_equal 404, f.last_response.status
   assert_equal "text/plain", f.last_response.headers["Content-Type"]
   assert_equal "Also not found!", f.last_response.body
+end
+
+test "script name and path info" do |f|
+  f.get("/script/path")
+  assert_equal 200, f.last_response.status
+  assert_equal "/script/path", f.last_response.body
 end
