@@ -209,11 +209,17 @@ class Syro
   end
 
   class Deck
-    module API
-      def initialize(code)
-        @syro_code = code
+    # Attaches the supplied block to a subclass of Deck as #syro_dispatch!
+    # Returns the subclassed Deck.
+    def self.syro_implement(&code)
+      Class.new(self) do
+        define_method(:syro_dispatch!, code)
+        private :syro_dispatch!
+        define_method(:inspect) { self.class.superclass.inspect }
       end
+    end
 
+    module API
       def env
         @syro_env
       end
@@ -268,7 +274,7 @@ class Syro
         @syro_inbox = inbox
 
         catch(:halt) do
-          instance_eval(&@syro_code)
+          syro_dispatch!
           finish!
         end
       end
@@ -420,11 +426,10 @@ class Syro
   end
 
   def initialize(deck = Deck, &code)
-    @deck = deck
-    @code = code
+    @deck = deck.syro_implement(&code)
   end
 
   def call(env, inbox = env.fetch(Syro::INBOX, {}))
-    @deck.new(@code).call(env, inbox)
+    @deck.new.call(env, inbox)
   end
 end

@@ -117,6 +117,10 @@ script_name = Syro.new do
   end
 end
 
+exception = Syro.new do
+  get { res.text(this_method_does_not_exist) }
+end
+
 app = Syro.new do
   get do
     res.write "GET /"
@@ -259,6 +263,10 @@ app = Syro.new do
 
   on "script" do
     run(script_name)
+  end
+
+  on "exception" do
+    run(exception)
   end
 end
 
@@ -442,4 +450,12 @@ test "script name and path info" do |f|
   f.get("/script/path")
   assert_equal 200, f.last_response.status
   assert_equal "/script/path", f.last_response.body
+end
+
+test "deck exceptions reference a named class" do |f|
+  f.get("/exception")
+rescue NameError => exception
+  exception
+ensure
+  assert exception.to_s.include?("Syro::Deck")
 end
