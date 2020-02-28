@@ -209,13 +209,19 @@ class Syro
   end
 
   class Deck
-    # Attaches the supplied block to a subclass of Deck as #syro_dispatch!
+
+    # Attaches the supplied block to a subclass of Deck as #dispatch!
     # Returns the subclassed Deck.
-    def self.syro_implement(&code)
+    def self.implement(&code)
       Class.new(self) do
-        define_method(:syro_dispatch!, code)
-        private :syro_dispatch!
-        define_method(:inspect) { self.class.superclass.inspect }
+        define_method(:dispatch!, code)
+        private :dispatch!
+
+        # Instead of calling inspect on this anonymous class,
+        # defer to the superclass which is likely Syro::Deck.
+        define_method(:inspect) do
+          self.class.superclass.inspect
+        end
       end
     end
 
@@ -274,7 +280,7 @@ class Syro
         @syro_inbox = inbox
 
         catch(:halt) do
-          syro_dispatch!
+          dispatch!
           finish!
         end
       end
@@ -426,7 +432,7 @@ class Syro
   end
 
   def initialize(deck = Deck, &code)
-    @deck = deck.syro_implement(&code)
+    @deck = deck.implement(&code)
   end
 
   def call(env, inbox = env.fetch(Syro::INBOX, {}))
