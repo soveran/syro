@@ -455,7 +455,6 @@ end
 test "deck exceptions reference a named class" do |f|
   f.get("/exception")
 rescue NameError => exception
-  exception
 ensure
   assert exception.to_s.include?("Syro::Deck")
 end
