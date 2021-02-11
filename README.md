@@ -99,7 +99,7 @@ the inbox.
 `match`: Receives a String, a Symbol or a boolean, and returns true
 if it matches the request.
 
-`default`: Receives a block that will be executed inconditionally.
+`default`: Receives a block that will be executed unconditionally.
 
 `on`: Receives a value to be matched, and a block that will be
 executed only if the request is matched.
