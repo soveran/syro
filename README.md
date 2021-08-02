@@ -278,7 +278,7 @@ App = Syro.new do
   end
 
   get do
-    res.text "Found!
+    res.text "Found!"
   end
 end
 ```
